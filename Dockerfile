@@ -9,13 +9,16 @@ LABEL maintainer="Angel Adames <angelmadames@gmail.com>"
 ENV PHPV 5.2.17
 
 # Install required packages to compile PHP
-RUN yum clean all && yum update -y \
-    && yum install -y epel-release \
+RUN yum install -y epel-release \
+    && yum update -y \
     && yum install -y wget bzip2 patch gcc gettext-devel make libtool libxml2-devel \
     pcre-devel zlib-devel openssl-devel libxslt-devel libpng-devel libXpm-devel \
     libc-client-devel libmcrypt-devel curl-devel expat-devel libjpeg-devel \
     libmhash libmhash-devel krb5-devel freetype-devel sqlite-devel mysql-devel aspell-devel \
-    && rm -rf /var/cache/yum
+    && yum clean all
+
+# Clean orphaned repos
+RUN rm -rf /var/cache/yum
 
 # Change to a safe directory
 WORKDIR /tmp/
@@ -40,20 +43,20 @@ WORKDIR /tmp/php-$PHPV
 
 # Compile PHP with the proper CONFIGURE_ARGS
 RUN ./configure --prefix=/usr/local --enable-fastcgi --enable-fpm --enable-cli \
-    --enable-fpm --enable-cli --enable-bcmath --enable-calendar \
-	  --enable-exif --enable-ftp --enable-gd-native-ttf \
-	  --enable-libxml --with-libxml-dir=/opt/include/libxml2 \
-    --enable-magic-quotes --enable-mbstring \
-	  --enable-pdo=shared --enable-soap --enable-sockets \
-	  --enable-sqlite-utf8 --enable-wddx --enable-zip \
-	  --with-curl --with-freetype-dir=/opt/include/freetype2 \
-	  --with-gd --with-gettext --with-jpeg-dir=/opt \
-	  --with-kerberos --with-libexpat-dir=/opt --with-mcrypt=/opt \
-    --with-mime-magic --with-mysql=/opt --with-mysqli \
-	  --with-openssl --with-pcre-regex --with-pdo-mysql=shared \
-    --with-pdo-sqlite=shared --with-png-dir=/opt --with-pspell \
-	  --with-sqlite=shared --with-ttf --with-xmlrpc --with-xpm-dir=/opt \
-	  --with-xsl=/opt/include/libxslt/ --with-zlib --with-zlib-dir=/opt
+	--enable-fpm --enable-cli --enable-bcmath --enable-calendar \
+	--enable-exif --enable-ftp --enable-gd-native-ttf \
+	--enable-libxml --with-libxml-dir=/opt/include/libxml2 \
+	--enable-magic-quotes --enable-mbstring \
+	--enable-pdo=shared --enable-soap --enable-sockets \
+	--enable-sqlite-utf8 --enable-wddx --enable-zip \
+	--with-curl --with-freetype-dir=/opt/include/freetype2 \
+	--with-gd --with-gettext --with-jpeg-dir=/opt \
+	--with-kerberos --with-libexpat-dir=/opt --with-mcrypt=/opt \
+	--with-mime-magic --with-mysql=/opt --with-mysqli \
+	--with-openssl --with-pcre-regex --with-pdo-mysql=shared \
+	--with-pdo-sqlite=shared --with-png-dir=/opt --with-pspell \
+	--with-sqlite=shared --with-ttf --with-xmlrpc --with-xpm-dir=/opt \
+	--with-xsl=/opt/include/libxslt/ --with-zlib --with-zlib-dir=/opt
 
 # Run make install for legacy PHP configured source
 RUN make all install
